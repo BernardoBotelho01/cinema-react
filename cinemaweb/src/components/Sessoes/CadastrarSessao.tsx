@@ -1,36 +1,28 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { z, ZodError } from 'zod'
 import { createSessao, fetchFilmes, fetchSalas } from '../../services/api'
 import { Filme, Sala } from '../../models'
 
 // Esquema de validação completo para Sessões
-const sessaoSchema = z.object({
-  filmeId: z.string()
-    .min(1, { message: 'Selecione um filme' })
-    .transform(val => parseInt(val, 10))
-    .refine(val => !isNaN(val), { message: 'Filme inválido' }),
-  
-  salaId: z.string()
-    .min(1, { message: 'Selecione uma sala' })
-    .transform(val => parseInt(val, 10))
-    .refine(val => !isNaN(val), { message: 'Sala inválida' }),
-  
-  horarioExibicao: z.string()
-    .min(1, { message: 'Data e hora são obrigatórias' })
-})
-.refine(
-  (data) => {
-    const dataSessao = new Date(data.horarioExibicao)
-    const agora = new Date()
-    agora.setMinutes(agora.getMinutes() - 5) // Margem de 5 minutos
-    return dataSessao >= agora
-  },
-  {
-    message: 'A data da sessão não pode ser retroativa (anterior à data atual)',
-    path: ['horarioExibicao']
-  }
-)
+const sessaoSchema = z
+  .object({
+    filmeId: z.string().min(1, { message: 'Selecione um filme' }),
+    salaId: z.string().min(1, { message: 'Selecione uma sala' }),
+    horarioExibicao: z.string().min(1, { message: 'Data e hora são obrigatórias' }),
+  })
+  .refine(
+    (data) => {
+      const dataSessao = new Date(data.horarioExibicao)
+      const agora = new Date()
+      agora.setMinutes(agora.getMinutes() - 5) // margem de 5 minutos
+      return dataSessao >= agora
+    },
+    {
+      message: 'A data da sessão não pode ser retroativa (anterior à data atual)',
+      path: ['horarioExibicao'],
+    },
+  )
 
 type FormData = {
   filmeId: string
@@ -43,10 +35,10 @@ const CadastrarSessao = () => {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const [carregando, setCarregando] = useState(true)
-  
+
   const [filmes, setFilmes] = useState<Filme[]>([])
   const [salas, setSalas] = useState<Sala[]>([])
-  
+
   const [formData, setFormData] = useState<FormData>({
     filmeId: '',
     salaId: '',
@@ -59,10 +51,7 @@ const CadastrarSessao = () => {
 
   const carregarDados = async () => {
     try {
-      const [filmesData, salasData] = await Promise.all([
-        fetchFilmes(),
-        fetchSalas()
-      ])
+      const [filmesData, salasData] = await Promise.all([fetchFilmes(), fetchSalas()])
       setFilmes(filmesData)
       setSalas(salasData)
     } catch (err) {
@@ -73,32 +62,30 @@ const CadastrarSessao = () => {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }))
+      setErrors((prev) => ({ ...prev, [name]: '' }))
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
       const validatedData = sessaoSchema.parse(formData)
-      
-      console.log('Dados validados:', validatedData)
-      
+
       await createSessao({
-        filmeId: validatedData.filmeId,
+        filmeId: validatedData.filmeId, // string ou number, tanto faz
         salaId: validatedData.salaId,
         horarioExibicao: validatedData.horarioExibicao,
       })
-      
+
       alert('Sessão agendada com sucesso!')
       navigate('/sessoes')
     } catch (error) {
@@ -111,7 +98,7 @@ const CadastrarSessao = () => {
           }
         })
         setErrors(newErrors)
-        console.error('Erros de validação:', error.issues) // Mudado para error.issues
+        console.error('Erros de validação:', error.issues)
       } else {
         console.error('Erro ao agendar sessão:', error)
         alert('Erro ao agendar sessão. Verifique o console para mais detalhes.')
@@ -147,6 +134,7 @@ const CadastrarSessao = () => {
         </div>
         <div className="card-body">
           <form onSubmit={handleSubmit}>
+            {/* FILME */}
             <div className="mb-3">
               <label className="form-label">Filme *</label>
               <select
@@ -156,9 +144,11 @@ const CadastrarSessao = () => {
                 onChange={handleChange}
                 disabled={filmes.length === 0}
               >
-                <option value="">{filmes.length === 0 ? 'Nenhum filme cadastrado' : 'Selecione um filme'}</option>
+                <option value="">
+                  {filmes.length === 0 ? 'Nenhum filme cadastrado' : 'Selecione um filme'}
+                </option>
                 {filmes.map((filme) => (
-                  <option key={filme.id} value={filme.id}>
+                  <option key={filme.id} value={String(filme.id)}>
                     {filme.titulo} - {filme.classificacao} - {filme.duracao}min
                   </option>
                 ))}
@@ -167,12 +157,15 @@ const CadastrarSessao = () => {
               {filmes.length === 0 && (
                 <div className="alert alert-warning mt-2">
                   <i className="bi bi-exclamation-triangle me-2"></i>
-                  Nenhum filme cadastrado. 
-                  <a href="/filmes/cadastrar" className="ms-1 fw-bold">Cadastre um filme primeiro</a>
+                  Nenhum filme cadastrado.
+                  <a href="/filmes/cadastrar" className="ms-1 fw-bold">
+                    Cadastre um filme primeiro
+                  </a>
                 </div>
               )}
             </div>
 
+            {/* SALA */}
             <div className="mb-3">
               <label className="form-label">Sala *</label>
               <select
@@ -182,9 +175,11 @@ const CadastrarSessao = () => {
                 onChange={handleChange}
                 disabled={salas.length === 0}
               >
-                <option value="">{salas.length === 0 ? 'Nenhuma sala cadastrada' : 'Selecione uma sala'}</option>
+                <option value="">
+                  {salas.length === 0 ? 'Nenhuma sala cadastrada' : 'Selecione uma sala'}
+                </option>
                 {salas.map((sala) => (
-                  <option key={sala.id} value={sala.id}>
+                  <option key={sala.id} value={String(sala.id)}>
                     Sala {sala.numero} - {sala.capacidade} lugares
                   </option>
                 ))}
@@ -193,12 +188,15 @@ const CadastrarSessao = () => {
               {salas.length === 0 && (
                 <div className="alert alert-warning mt-2">
                   <i className="bi bi-exclamation-triangle me-2"></i>
-                  Nenhuma sala cadastrada. 
-                  <a href="/salas/cadastrar" className="ms-1 fw-bold">Cadastre uma sala primeiro</a>
+                  Nenhuma sala cadastrada.
+                  <a href="/salas/cadastrar" className="ms-1 fw-bold">
+                    Cadastre uma sala primeiro
+                  </a>
                 </div>
               )}
             </div>
 
+            {/* DATA/HORA */}
             <div className="mb-4">
               <label className="form-label">Data e Hora da Sessão *</label>
               <input
@@ -210,12 +208,15 @@ const CadastrarSessao = () => {
                 min={minDateTime}
                 step="300"
               />
-              {errors.horarioExibicao && <div className="invalid-feedback">{errors.horarioExibicao}</div>}
+              {errors.horarioExibicao && (
+                <div className="invalid-feedback">{errors.horarioExibicao}</div>
+              )}
               <small className="text-muted">
                 Não pode ser retroativa. Use o formato DD/MM/AAAA HH:MM
               </small>
             </div>
 
+            {/* BOTÕES */}
             <div className="d-flex justify-content-end gap-2">
               <button
                 type="button"
@@ -232,7 +233,11 @@ const CadastrarSessao = () => {
               >
                 {loading ? (
                   <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
                     Agendando...
                   </>
                 ) : (

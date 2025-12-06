@@ -1,15 +1,15 @@
 export enum Genero {
-  Acao = "Ação",
-  Aventura = "Aventura",
-  Comedia = "Comédia",
-  Drama = "Drama",
-  Terror = "Terror",
-  Romance = "Romance",
-  Fantasia = "Fantasia",
+  Acao = 'Ação',
+  Aventura = 'Aventura',
+  Comedia = 'Comédia',
+  Drama = 'Drama',
+  Terror = 'Terror',
+  Romance = 'Romance',
+  Fantasia = 'Fantasia',
 }
 
 export interface Filme {
-  id?: number
+  id?: number | string
   titulo: string
   sinopse: string
   classificacao: string
@@ -20,24 +20,24 @@ export interface Filme {
 }
 
 export interface Sala {
-  id?: number
+  id?: number | string
   numero: number
   capacidade: number
   poutronas: number[][]
 }
 
 export interface Sessao {
-  id?: number
+  id?: number | string
   horarioExibicao: string
-  filmeId: number
-  salaId: number
+  filmeId: number | string
+  salaId: number | string
   filme?: Filme
   sala?: Sala
 }
 
 export interface Ingresso {
-  id?: number
-  sessaoId: number
+  id?: number | string
+  sessaoId: number | string
   tipo: 'INTEIRA' | 'MEIA'
   valor: number
   dataVenda: string

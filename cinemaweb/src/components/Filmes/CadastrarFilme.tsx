@@ -1,69 +1,73 @@
-import { useState } from 'react'
+import { useState, ChangeEvent, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { z, ZodError } from 'zod'
 import { createFilme } from '../../services/api'
 import { Genero } from '../../models'
 
 // Esquema de validação completo para Filmes
-const filmeSchema = z.object({
-  titulo: z.string()
-    .min(1, { message: 'Título é obrigatório' })
-    .max(100, { message: 'Título deve ter no máximo 100 caracteres' }),
-  
-  sinopse: z.string()
-    .min(10, { message: 'A sinopse deve ter no mínimo 10 caracteres' })
-    .max(1000, { message: 'Sinopse deve ter no máximo 1000 caracteres' }),
-  
-  classificacao: z.string()
-    .min(1, { message: 'Classificação é obrigatória' })
-    .max(20, { message: 'Classificação deve ter no máximo 20 caracteres' }),
-  
-  duracao: z.number()
-    .positive({ message: 'Duração deve ser um número positivo (maior que 0)' })
-    .int({ message: 'Duração deve ser um número inteiro' })
-    .max(300, { message: 'Duração não pode exceder 300 minutos' }),
-  
-  genero: z.string()
-    .refine((val) => Object.values(Genero).includes(val as Genero), {
-      message: 'Selecione um gênero válido'
-    }),
-  
-  dataIniciaExibicao: z.string()
-    .min(1, { message: 'Data de início é obrigatória' }),
-  
-  dataFinalExibicao: z.string()
-    .min(1, { message: 'Data final é obrigatória' })
-})
-.refine(
-  (data) => {
-    const dataInicio = new Date(data.dataIniciaExibicao)
-    const hoje = new Date()
-    hoje.setHours(0, 0, 0, 0)
-    return dataInicio >= hoje
-  },
-  {
-    message: 'Data de início não pode ser retroativa',
-    path: ['dataIniciaExibicao']
-  }
-)
-.refine(
-  (data) => {
-    const dataInicio = new Date(data.dataIniciaExibicao)
-    const dataFim = new Date(data.dataFinalExibicao)
-    return dataFim > dataInicio
-  },
-  {
-    message: 'Data final deve ser posterior à data inicial',
-    path: ['dataFinalExibicao']
-  }
-)
+const filmeSchema = z
+  .object({
+    titulo: z
+      .string()
+      .min(1, { message: 'Título é obrigatório' })
+      .max(100, { message: 'Título deve ter no máximo 100 caracteres' }),
+
+    sinopse: z
+      .string()
+      .min(10, { message: 'A sinopse deve ter no mínimo 10 caracteres' })
+      .max(1000, { message: 'Sinopse deve ter no máximo 1000 caracteres' }),
+
+    classificacao: z
+      .string()
+      .min(1, { message: 'Classificação é obrigatória' })
+      .max(20, { message: 'Classificação deve ter no máximo 20 caracteres' }),
+
+    duracao: z
+      .number()
+      .positive({ message: 'Duração deve ser um número positivo (maior que 0)' })
+      .int({ message: 'Duração deve ser um número inteiro' })
+      .max(300, { message: 'Duração não pode exceder 300 minutos' }),
+
+    genero: z
+      .string()
+      .refine((val) => Object.values(Genero).includes(val as Genero), {
+        message: 'Selecione um gênero válido',
+      }),
+
+    dataIniciaExibicao: z.string().min(1, { message: 'Data de início é obrigatória' }),
+
+    dataFinalExibicao: z.string().min(1, { message: 'Data final é obrigatória' }),
+  })
+  .refine(
+    (data) => {
+      const dataInicio = new Date(data.dataIniciaExibicao)
+      const hoje = new Date()
+      hoje.setHours(0, 0, 0, 0)
+      return dataInicio >= hoje
+    },
+    {
+      message: 'Data de início não pode ser retroativa',
+      path: ['dataIniciaExibicao'],
+    },
+  )
+  .refine(
+    (data) => {
+      const dataInicio = new Date(data.dataIniciaExibicao)
+      const dataFim = new Date(data.dataFinalExibicao)
+      return dataFim > dataInicio
+    },
+    {
+      message: 'Data final deve ser posterior à data inicial',
+      path: ['dataFinalExibicao'],
+    },
+  )
 
 type FormData = {
   titulo: string
   sinopse: string
   classificacao: string
   duracao: number
-  genero: string  // Alterado para string para compatibilidade com Zod
+  genero: string
   dataIniciaExibicao: string
   dataFinalExibicao: string
 }
@@ -84,31 +88,30 @@ const CadastrarFilme = () => {
   })
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'duracao' ? Number(value) : value
+      [name]: name === 'duracao' ? Number(value) : value,
     }))
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }))
+      setErrors((prev) => ({ ...prev, [name]: '' }))
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
       const validatedData = filmeSchema.parse(formData)
-      
-      // Converter genero de string para enum Genero
+
       const filmeParaEnviar = {
         ...validatedData,
-        genero: validatedData.genero as Genero  // Type assertion aqui
+        genero: validatedData.genero as Genero,
       }
-      
+
       await createFilme(filmeParaEnviar)
       navigate('/filmes')
     } catch (error) {
@@ -170,7 +173,9 @@ const CadastrarFilme = () => {
                   onChange={handleChange}
                   placeholder="Ex: Livre, 12 anos, 16 anos, 18 anos"
                 />
-                {errors.classificacao && <div className="invalid-feedback">{errors.classificacao}</div>}
+                {errors.classificacao && (
+                  <div className="invalid-feedback">{errors.classificacao}</div>
+                )}
                 <small className="text-muted">Ex: Livre, 10, 12, 14, 16, 18 anos</small>
               </div>
             </div>
@@ -216,7 +221,9 @@ const CadastrarFilme = () => {
                 >
                   <option value="">Selecione um gênero</option>
                   {Object.values(Genero).map((genero) => (
-                    <option key={genero} value={genero}>{genero}</option>
+                    <option key={genero} value={genero}>
+                      {genero}
+                    </option>
                   ))}
                 </select>
                 {errors.genero && <div className="invalid-feedback">{errors.genero}</div>}
@@ -229,12 +236,16 @@ const CadastrarFilme = () => {
                 <input
                   type="date"
                   name="dataIniciaExibicao"
-                  className={`form-control ${errors.dataIniciaExibicao ? 'is-invalid' : ''}`}
+                  className={`form-control ${
+                    errors.dataIniciaExibicao ? 'is-invalid' : ''
+                  }`}
                   value={formData.dataIniciaExibicao}
                   onChange={handleChange}
                   min={today}
                 />
-                {errors.dataIniciaExibicao && <div className="invalid-feedback">{errors.dataIniciaExibicao}</div>}
+                {errors.dataIniciaExibicao && (
+                  <div className="invalid-feedback">{errors.dataIniciaExibicao}</div>
+                )}
                 <small className="text-muted">Não pode ser retroativa</small>
               </div>
 
@@ -243,12 +254,16 @@ const CadastrarFilme = () => {
                 <input
                   type="date"
                   name="dataFinalExibicao"
-                  className={`form-control ${errors.dataFinalExibicao ? 'is-invalid' : ''}`}
+                  className={`form-control ${
+                    errors.dataFinalExibicao ? 'is-invalid' : ''
+                  }`}
                   value={formData.dataFinalExibicao}
                   onChange={handleChange}
                   min={minEndDate}
                 />
-                {errors.dataFinalExibicao && <div className="invalid-feedback">{errors.dataFinalExibicao}</div>}
+                {errors.dataFinalExibicao && (
+                  <div className="invalid-feedback">{errors.dataFinalExibicao}</div>
+                )}
                 <small className="text-muted">Deve ser posterior à data inicial</small>
               </div>
             </div>
@@ -262,14 +277,14 @@ const CadastrarFilme = () => {
               >
                 Cancelar
               </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={loading}
-              >
+              <button type="submit" className="btn btn-primary" disabled={loading}>
                 {loading ? (
                   <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
                     Cadastrando...
                   </>
                 ) : (

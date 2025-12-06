@@ -1,27 +1,51 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchSessoes, deleteSessao } from '../services/api'
+import { fetchSessoes, deleteSessao, fetchFilmes, fetchSalas } from '../services/api'
 import VendaIngressoModal from '../components/Ingressos/VendaIngressoModal'
-import { Sessao } from '../models'
+import { Sessao, Filme, Sala } from '../models'
 
 const SessoesPage = () => {
   const [sessoes, setSessoes] = useState<Sessao[]>([])
+  const [filmes, setFilmes] = useState<Filme[]>([])
+  const [salas, setSalas] = useState<Sala[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [sessaoSelecionada, setSessaoSelecionada] = useState<Sessao | null>(null)
   const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
-    carregarSessoes()
+    carregarDados()
   }, [])
 
-  const carregarSessoes = async () => {
+  const carregarDados = async () => {
     try {
       setLoading(true)
-      console.log('Carregando sessões...')
-      const dados = await fetchSessoes()
-      console.log('Sessões carregadas:', dados)
-      setSessoes(dados)
+
+      const [filmesData, salasData, sessoesData] = await Promise.all([
+        fetchFilmes(),
+        fetchSalas(),
+        fetchSessoes(),
+      ])
+
+      setFilmes(filmesData)
+      setSalas(salasData)
+
+      const sessoesComRelacionamentos: Sessao[] = sessoesData.map((sessao) => {
+        const filme = filmesData.find(
+          (f) => String(f.id) === String(sessao.filmeId),
+        )
+        const sala = salasData.find(
+          (s) => String(s.id) === String(sessao.salaId),
+        )
+
+        return {
+          ...sessao,
+          filme,
+          sala,
+        }
+      })
+
+      setSessoes(sessoesComRelacionamentos)
     } catch (err) {
       console.error('Erro ao carregar sessões:', err)
       setError('Erro ao carregar sessões. Verifique se o servidor está rodando.')
@@ -30,11 +54,11 @@ const SessoesPage = () => {
     }
   }
 
-  const handleDelete = async (id: number, filmeTitulo: string) => {
+  const handleDelete = async (id: number | string, filmeTitulo: string) => {
     if (window.confirm(`Tem certeza que deseja excluir a sessão do filme "${filmeTitulo}"?`)) {
       try {
         await deleteSessao(id)
-        carregarSessoes()
+        carregarDados()
       } catch (err) {
         alert('Erro ao excluir sessão')
       }
@@ -42,7 +66,6 @@ const SessoesPage = () => {
   }
 
   const abrirModalVenda = (sessao: Sessao) => {
-    console.log('Abrindo modal para sessão:', sessao)
     setSessaoSelecionada(sessao)
     setShowModal(true)
   }
@@ -70,7 +93,9 @@ const SessoesPage = () => {
           <i className="bi bi-exclamation-triangle me-2"></i>
           {error}
           <div className="mt-2">
-            <small>Certifique-se de que o json-server está rodando: <code>npm run server</code></small>
+            <small>
+              Certifique-se de que o json-server está rodando: <code>npm run server</code>
+            </small>
           </div>
         </div>
       </div>
@@ -117,7 +142,9 @@ const SessoesPage = () => {
                   <th>Filme</th>
                   <th>Sala</th>
                   <th>Data e Horário</th>
-                  <th style={{ width: '150px' }} className="text-center">Ações</th>
+                  <th style={{ width: '150px' }} className="text-center">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -126,17 +153,21 @@ const SessoesPage = () => {
                     <td className="fw-bold">{index + 1}</td>
                     <td>
                       <div>
-                        <strong className="d-block">{sessao.filme?.titulo || 'Sem filme'}</strong>
+                        <strong className="d-block">
+                          {sessao.filme?.titulo || 'Sem filme'}
+                        </strong>
                         <small className="text-muted">
-                          ID: {sessao.id} | FilmeID: {sessao.filmeId}
+                          ID: {String(sessao.id)} | FilmeID: {String(sessao.filmeId)}
                         </small>
                       </div>
                     </td>
                     <td>
                       <div>
-                        <strong className="d-block">Sala {sessao.sala?.numero || 'N/A'}</strong>
+                        <strong className="d-block">
+                          Sala {sessao.sala?.numero ?? 'N/A'}
+                        </strong>
                         <small className="text-muted">
-                          SalaID: {sessao.salaId}
+                          SalaID: {String(sessao.salaId)}
                         </small>
                       </div>
                     </td>
@@ -147,7 +178,7 @@ const SessoesPage = () => {
                         <small className="text-muted">
                           {new Date(sessao.horarioExibicao).toLocaleTimeString('pt-BR', {
                             hour: '2-digit',
-                            minute: '2-digit'
+                            minute: '2-digit',
                           })}
                         </small>
                       </div>
@@ -164,7 +195,9 @@ const SessoesPage = () => {
                         </button>
                         <button
                           className="btn btn-outline-danger btn-sm"
-                          onClick={() => handleDelete(sessao.id!, sessao.filme?.titulo || 'Sessão')}
+                          onClick={() =>
+                            handleDelete(sessao.id!, sessao.filme?.titulo || 'Sessão')
+                          }
                           title="Excluir Sessão"
                         >
                           <i className="bi bi-trash"></i>
@@ -176,16 +209,16 @@ const SessoesPage = () => {
               </tbody>
             </table>
           </div>
-        </>
-      )}
 
-      {sessaoSelecionada && (
-        <VendaIngressoModal
-          show={showModal}
-          onClose={fecharModal}
-          sessao={sessaoSelecionada}
-          onVendaConcluida={carregarSessoes}
-        />
+          {sessaoSelecionada && (
+            <VendaIngressoModal
+              show={showModal}
+              onClose={fecharModal}
+              sessao={sessaoSelecionada}
+              onVendaConcluida={carregarDados}
+            />
+          )}
+        </>
       )}
     </div>
   )

@@ -55,7 +55,9 @@ const FilmesList = () => {
           <i className="bi bi-exclamation-triangle me-2"></i>
           {error}
           <div className="mt-2">
-            <small>Certifique-se de que o json-server está rodando: <code>npm run server</code></small>
+            <small>
+              Certifique-se de que o json-server está rodando: <code>npm run server</code>
+            </small>
           </div>
         </div>
       </div>
@@ -105,23 +107,29 @@ const FilmesList = () => {
                 </div>
                 <div className="card-body">
                   <p className="card-text text-muted">
-                    {filme.sinopse.length > 150 
-                      ? `${filme.sinopse.substring(0, 150)}...` 
+                    {filme.sinopse.length > 150
+                      ? `${filme.sinopse.substring(0, 150)}...`
                       : filme.sinopse}
                   </p>
                   <div className="mt-3">
                     <div className="d-flex align-items-center mb-2">
                       <i className="bi bi-clock text-primary me-2"></i>
-                      <span><strong>Duração:</strong> {filme.duracao} minutos</span>
+                      <span>
+                        <strong>Duração:</strong> {filme.duracao} minutos
+                      </span>
                     </div>
                     <div className="d-flex align-items-center mb-2">
                       <i className="bi bi-tags text-primary me-2"></i>
-                      <span><strong>Gênero:</strong> {filme.genero}</span>
+                      <span>
+                        <strong>Gênero:</strong> {filme.genero}
+                      </span>
                     </div>
                     <div className="d-flex align-items-center">
                       <i className="bi bi-calendar text-primary me-2"></i>
                       <span>
-                        <strong>Exibição:</strong> {new Date(filme.dataIniciaExibicao).toLocaleDateString()} a {new Date(filme.dataFinalExibicao).toLocaleDateString()}
+                        <strong>Exibição:</strong>{' '}
+                        {new Date(filme.dataIniciaExibicao).toLocaleDateString()} a{' '}
+                        {new Date(filme.dataFinalExibicao).toLocaleDateString()}
                       </span>
                     </div>
                   </div>

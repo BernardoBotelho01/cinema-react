@@ -1,39 +1,20 @@
 {
   "filmes": [
     {
-      "id": "65b1",
+      "id": "11b7",
       "titulo": "MegaMan",
-      "sinopse": "asafdesafdfsd",
-      "classificacao": "Livre",
-      "duracao": 60,
-      "genero": "Aventura",
-      "dataIniciaExibicao": "2025-12-30",
-      "dataFinalExibicao": "2026-01-30"
+      "sinopse": "DXDdadASDasdsadASDAS",
+      "classificacao": "LIVRE",
+      "duracao": 100,
+      "genero": "Ação",
+      "dataIniciaExibicao": "2025-12-07",
+      "dataFinalExibicao": "2025-12-31"
     }
   ],
   "salas": [
     {
-      "id": "1b55",
+      "id": "f346",
       "numero": 1,
-      "capacidade": 10,
-      "poutronas": [
-        [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ]
-      ]
-    },
-    {
-      "id": "7711",
-      "numero": 2,
       "capacidade": 20,
       "poutronas": [
         [
@@ -65,96 +46,11 @@
   ],
   "sessoes": [
     {
-      "id": "77b3",
-      "filmeId": 65,
-      "salaId": 1,
-      "horarioExibicao": "2026-01-03T01:24"
+      "id": "3667",
+      "filmeId": "11b7",
+      "salaId": "f346",
+      "horarioExibicao": "2025-12-25T23:24"
     }
   ],
-  "ingressos": [
-    {
-      "id": "093b",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:12:23.480Z"
-    },
-    {
-      "id": "f0e2",
-      "sessaoId": "3422",
-      "tipo": "MEIA",
-      "valor": 12.5,
-      "dataVenda": "2025-12-05T04:17:51.234Z"
-    },
-    {
-      "id": "bcb1",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:23:29.356Z"
-    },
-    {
-      "id": "6074",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:23:29.365Z"
-    },
-    {
-      "id": "854e",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:23:29.369Z"
-    },
-    {
-      "id": "93d6",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:23:29.373Z"
-    },
-    {
-      "id": "9774",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:23:29.377Z"
-    },
-    {
-      "id": "262e",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:23:29.381Z"
-    },
-    {
-      "id": "32e7",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:23:29.384Z"
-    },
-    {
-      "id": "0214",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:23:29.388Z"
-    },
-    {
-      "id": "f22d",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:23:29.391Z"
-    },
-    {
-      "id": "2b05",
-      "sessaoId": "6dd1",
-      "tipo": "INTEIRA",
-      "valor": 25,
-      "dataVenda": "2025-12-05T04:23:29.395Z"
-    }
-  ]
+  "ingressos": []
 }

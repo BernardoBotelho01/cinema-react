@@ -1,21 +1,23 @@
-import { useState } from 'react'
+import { useState, ChangeEvent, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { z, ZodError } from 'zod'
 import { createSala } from '../../services/api'
 
 // Esquema de validação para Salas
 const salaSchema = z.object({
-  numero: z.number()
+  numero: z
+    .number()
     .positive({ message: 'Número da sala deve ser positivo' })
     .int({ message: 'Número deve ser inteiro' })
     .min(1, { message: 'Número da sala é obrigatório' })
     .max(50, { message: 'Número máximo é 50' }),
-  
-  capacidade: z.number()
+
+  capacidade: z
+    .number()
     .positive({ message: 'Capacidade deve ser um número positivo' })
     .int({ message: 'Capacidade deve ser inteira' })
     .min(1, { message: 'Capacidade mínima é 1 lugar' })
-    .max(300, { message: 'Capacidade máxima é 300 lugares' })
+    .max(300, { message: 'Capacidade máxima é 300 lugares' }),
 })
 
 type FormData = {
@@ -33,23 +35,23 @@ const CadastrarSala = () => {
     capacidade: 0,
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: Number(value)
+      [name]: Number(value),
     }))
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }))
+      setErrors((prev) => ({ ...prev, [name]: '' }))
     }
   }
 
   const criarPoltronas = (capacidade: number) => {
     const filas = Math.ceil(capacidade / 10)
     const poltronas: number[][] = []
-    
+
     for (let i = 0; i < filas; i++) {
-      const poltronasFila = []
+      const poltronasFila: number[] = []
       for (let j = 0; j < 10; j++) {
         if (i * 10 + j < capacidade) {
           poltronasFila.push(0) // 0 = disponível
@@ -59,23 +61,23 @@ const CadastrarSala = () => {
       }
       poltronas.push(poltronasFila)
     }
-    
+
     return poltronas
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
       const validatedData = salaSchema.parse(formData)
       const poltronas = criarPoltronas(validatedData.capacidade)
-      
+
       await createSala({
         ...validatedData,
-        poutronas: poltronas
+        poutronas: poltronas,
       })
-      
+
       navigate('/salas')
     } catch (error) {
       if (error instanceof ZodError) {
@@ -136,14 +138,18 @@ const CadastrarSala = () => {
                   max="300"
                   placeholder="Digite a capacidade máxima"
                 />
-                {errors.capacidade && <div className="invalid-feedback">{errors.capacidade}</div>}
+                {errors.capacidade && (
+                  <div className="invalid-feedback">{errors.capacidade}</div>
+                )}
                 <small className="text-muted">Número inteiro positivo (1-300 lugares)</small>
               </div>
             </div>
 
             {formData.capacidade > 0 && (
               <div className="mb-4">
-                <label className="form-label">Layout da Sala ({formData.capacidade} lugares)</label>
+                <label className="form-label">
+                  Layout da Sala ({formData.capacidade} lugares)
+                </label>
                 <div className="card">
                   <div className="card-body">
                     <div className="text-center mb-3">
@@ -160,15 +166,17 @@ const CadastrarSala = () => {
                               <div
                                 key={indexPoltrona}
                                 className={`d-flex align-items-center justify-content-center 
-                                  ${poltrona === 0 
-                                    ? 'bg-success text-white' 
-                                    : 'bg-secondary text-white'} 
+                                  ${
+                                    poltrona === 0
+                                      ? 'bg-success text-white'
+                                      : 'bg-secondary text-white'
+                                  } 
                                   rounded`}
                                 style={{
                                   width: '30px',
                                   height: '30px',
                                   fontSize: '0.8rem',
-                                  opacity: poltrona === -1 ? 0.3 : 1
+                                  opacity: poltrona === -1 ? 0.3 : 1,
                                 }}
                                 title={`Fila ${indexFila + 1}, Poltrona ${indexPoltrona + 1}`}
                               >
@@ -182,11 +190,17 @@ const CadastrarSala = () => {
                     <div className="mt-3">
                       <small className="text-muted">
                         <span className="d-inline-flex align-items-center me-3">
-                          <span className="bg-success rounded me-1" style={{width: '15px', height: '15px'}}></span>
+                          <span
+                            className="bg-success rounded me-1"
+                            style={{ width: '15px', height: '15px' }}
+                          ></span>
                           Disponível ({formData.capacidade})
                         </span>
                         <span className="d-inline-flex align-items-center">
-                          <span className="bg-secondary rounded me-1" style={{width: '15px', height: '15px'}}></span>
+                          <span
+                            className="bg-secondary rounded me-1"
+                            style={{ width: '15px', height: '15px' }}
+                          ></span>
                           Indisponível
                         </span>
                       </small>
@@ -203,7 +217,11 @@ const CadastrarSala = () => {
                   Observações
                 </h6>
                 <ul className="mb-0">
-                  <li>Layout automático: {formData.capacidade > 0 ? Math.ceil(formData.capacidade / 10) : 0} fila(s) de 10 poltronas</li>
+                  <li>
+                    Layout automático:{' '}
+                    {formData.capacidade > 0 ? Math.ceil(formData.capacidade / 10) : 0} fila(s) de
+                    10 poltronas
+                  </li>
                   <li>Cada poltrona é identificada por Fila/Posição</li>
                   <li>Poltronas marcadas com X não existem fisicamente</li>
                 </ul>
@@ -219,14 +237,14 @@ const CadastrarSala = () => {
               >
                 Cancelar
               </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={loading}
-              >
+              <button type="submit" className="btn btn-primary" disabled={loading}>
                 {loading ? (
                   <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
                     Cadastrando...
                   </>
                 ) : (
