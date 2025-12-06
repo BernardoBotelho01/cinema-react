@@ -35,11 +35,22 @@ export interface Sessao {
   sala?: Sala
 }
 
+// NOVO: modelo de Lanche
+export interface Lanche {
+  id?: number | string
+  nome: string
+  valor: number
+}
+
 export interface Ingresso {
   id?: number | string
   sessaoId: number | string
   tipo: 'INTEIRA' | 'MEIA'
-  valor: number
+  valor: number             // valor unitário do ingresso
   dataVenda: string
+  total?: number            // total da venda (ingressos + lanche)
+  lancheId?: number | string
+  lancheNome?: string
+  lancheValor?: number
   sessao?: Sessao
 }

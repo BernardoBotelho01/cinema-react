@@ -5,6 +5,8 @@ import SessoesPage from '../pages/SessoesPage'
 import CadastrarFilme from '../components/Filmes/CadastrarFilme'
 import CadastrarSala from '../components/Salas/CadastrarSala'
 import CadastrarSessao from '../components/Sessoes/CadastrarSessao'
+import LanchesPage from '../pages/LanchesPage'
+import CadastrarLanche from '../components/Lanches/CadastrarLanche'
 
 const RoutesComponent = () => {
   return (
@@ -16,6 +18,10 @@ const RoutesComponent = () => {
       <Route path="/salas/cadastrar" element={<CadastrarSala />} />
       <Route path="/sessoes" element={<SessoesPage />} />
       <Route path="/sessoes/cadastrar" element={<CadastrarSessao />} />
+
+      {/* NOVO */}
+      <Route path="/lanches" element={<LanchesPage />} />
+      <Route path="/lanches/cadastrar" element={<CadastrarLanche />} />
     </Routes>
   )
 }

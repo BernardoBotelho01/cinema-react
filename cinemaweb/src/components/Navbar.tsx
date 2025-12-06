@@ -41,6 +41,13 @@ const Navbar = () => {
                 Sessões
               </Link>
             </li>
+            {/* NOVO */}
+            <li className="nav-item">
+              <Link className="nav-link d-flex align-items-center" to="/lanches">
+                <i className="bi bi-cup-straw me-2"></i>
+                Lanches
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

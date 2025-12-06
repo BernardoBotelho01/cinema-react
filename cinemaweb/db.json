@@ -1,56 +1,7 @@
 {
-  "filmes": [
-    {
-      "id": "11b7",
-      "titulo": "MegaMan",
-      "sinopse": "DXDdadASDasdsadASDAS",
-      "classificacao": "LIVRE",
-      "duracao": 100,
-      "genero": "Ação",
-      "dataIniciaExibicao": "2025-12-07",
-      "dataFinalExibicao": "2025-12-31"
-    }
-  ],
-  "salas": [
-    {
-      "id": "f346",
-      "numero": 1,
-      "capacidade": 20,
-      "poutronas": [
-        [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ]
-      ]
-    }
-  ],
-  "sessoes": [
-    {
-      "id": "3667",
-      "filmeId": "11b7",
-      "salaId": "f346",
-      "horarioExibicao": "2025-12-25T23:24"
-    }
-  ],
-  "ingressos": []
+  "filmes": [],
+  "salas": [],
+  "sessoes": [],
+  "ingressos": [],
+  "lanches": []
 }

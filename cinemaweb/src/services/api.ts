@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Filme, Sala, Sessao, Ingresso } from '../models'
+import { Filme, Sala, Sessao, Ingresso, Lanche } from '../models'
 
 const api = axios.create({
   baseURL: 'http://localhost:3000/',
@@ -37,7 +37,7 @@ export const deleteSala = async (id: number | string): Promise<void> => {
 
 // -------- Sessões --------
 export const fetchSessoes = async (): Promise<Sessao[]> => {
-  // sem _expand, o join é feito no front
+  // buscamos seco, e o join é feito no front
   const response = await api.get('sessoes')
   return response.data
 }
@@ -51,6 +51,23 @@ export const createSessao = async (
 
 export const deleteSessao = async (id: number | string): Promise<void> => {
   await api.delete(`sessoes/${id}`)
+}
+
+// -------- Lanches (NOVO) --------
+export const fetchLanches = async (): Promise<Lanche[]> => {
+  const response = await api.get('lanches')
+  return response.data
+}
+
+export const createLanche = async (
+  lanche: Omit<Lanche, 'id'>,
+): Promise<Lanche> => {
+  const response = await api.post('lanches', lanche)
+  return response.data
+}
+
+export const deleteLanche = async (id: number | string): Promise<void> => {
+  await api.delete(`lanches/${id}`)
 }
 
 // -------- Ingressos --------
@@ -67,7 +84,10 @@ export const createIngresso = async (
 }
 
 // Atualizar sala (se for usar depois)
-export const updateSala = async (id: number | string, sala: Sala): Promise<Sala> => {
+export const updateSala = async (
+  id: number | string,
+  sala: Sala,
+): Promise<Sala> => {
   const response = await api.put(`salas/${id}`, sala)
   return response.data
 }
